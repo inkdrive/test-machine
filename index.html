@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Paper Generator</title>
+    <style>
+        /* Terminal-like styling */
+        body {
+            background: black;
+            color: #33FF33;
+            font-family: monospace;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+        }
+        textarea {
+            background: black;
+            color: #33FF33;
+            border: 1px solid #33FF33;
+            width: 100%;
+            font-family: monospace;
+            margin-bottom: 10px;
+            padding: 5px;
+            height: 300px;
+        }
+        button {
+            background: #33FF33;
+            color: black;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            margin-top: 5px;
+        }
+        button:hover {
+            background: #55ff55;
+        }
+        .log p {
+            margin: 5px 0;
+        }
+        code {
+            background: #222;
+            padding: 2px 4px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Test Paper Generator Terminal</h1>
+    <p>Enter your questions (one per line) using this format:</p>
+    <p>
+        <code>QUESTION_TEXT | OPTION_A | OPTION_B | OPTION_C | OPTION_D | CORRECT_OPTION_LETTER</code>
+    </p>
+    <p>Example:</p>
+    <p>
+        <code>What is the function of the diaphragm? | Contraction | Relaxation | Gas exchange | None | A</code>
+    </p>
+    <textarea id="questionInput" placeholder="Enter one question per line"></textarea>
+    <br>
+    <button onclick="addQuestions()">Add Questions</button>
+    <button onclick="saveTest()">Save Test and Open Test Page</button>
+    <div id="log" class="log"></div>
+</div>
+
+<script>
+    let questions = [];
+
+    function addQuestions() {
+        const inputField = document.getElementById("questionInput");
+        // Split the input by newlines so that each line is treated as one question
+        let lines = inputField.value.split("\n");
+        let addedCount = 0;
+        for (let line of lines) {
+            if (line.trim() === "") continue; // Skip empty lines
+            // Expected format: QUESTION | OPTION_A | OPTION_B | OPTION_C | OPTION_D | CORRECT_OPTION
+            let parts = line.split("|").map(s => s.trim());
+            if (parts.length !== 6) {
+                log(`Invalid format for line: ${line}`);
+                continue;
+            }
+            let [qText, optA, optB, optC, optD, correct] = parts;
+            correct = correct.toUpperCase();
+            const validLetters = ["A", "B", "C", "D"];
+            if (!validLetters.includes(correct)) {
+                log(`Correct option must be one of A, B, C, D for line: ${line}`);
+                continue;
+            }
+            let options = [optA, optB, optC, optD];
+            let answer = options[validLetters.indexOf(correct)];
+            questions.push({ question: qText, options: options, answer: answer });
+            addedCount++;
+        }
+        log(`${addedCount} question(s) added successfully.`);
+        // Clear the textarea after adding
+        inputField.value = "";
+    }
+
+    function saveTest() {
+        if (questions.length === 0) {
+            log("No questions added. Please add at least one question.");
+            return;
+        }
+        // Generate a random ID (e.g., 8 characters long)
+        const testId = Math.random().toString(36).substr(2, 8); // Generate 8-character random ID
+
+        // Save questions with the generated test ID in localStorage
+        localStorage.setItem(testId, JSON.stringify(questions));
+        log("Test saved successfully! Opening test page...");
+
+        // Redirect to the test page with the unique test ID in the URL
+        setTimeout(() => { window.location.href = `test.html?id=${testId}`; }, 1000);
+    }
+
+    function log(message) {
+        const logDiv = document.getElementById("log");
+        let p = document.createElement("p");
+        p.textContent = message;
+        logDiv.appendChild(p);
+    }
+</script>
+</body>
+</html>
