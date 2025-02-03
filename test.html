@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <title>Dynamic Test</title>
-  <style>
-    /* Cyberpunk Theme */
+  <style id="themeStyle">
+    /* Normal Theme */
     body {
-      background: #000000; /* Black background */
-      color: #33FF33; /* Neon green text */
+      background: #f5f5f5;
+      color: #222;
       font-family: "Arial", sans-serif;
       padding: 20px;
     }
@@ -15,16 +15,15 @@
     .container {
       max-width: 650px;
       margin: auto;
-      background: #282828;
-      color: #fff;
+      background: white;
       padding: 20px;
       border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0, 255, 255, 0.3);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     }
 
     h1 {
       text-align: center;
-      color: #00FFFF;
+      color: #0044cc;
       font-weight: bold;
     }
 
@@ -36,13 +35,13 @@
       text-align: center;
       border-radius: 5px;
       margin-bottom: 20px;
-      color: #FFD700;
+      color: white;
     }
 
     .question {
-      background: #333;
+      background: white;
       padding: 15px;
-      border: 1px solid #00FFFF;
+      border: 1px solid #ccc;
       border-radius: 8px;
       margin-bottom: 15px;
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
@@ -69,18 +68,18 @@
     }
 
     label:hover {
-      background: #555;
+      background: #eee;
     }
 
     input[type="radio"]:checked + label {
-      background: #00FFFF;
-      color: black;
-      border-color: #00FFFF;
+      background: #0044cc;
+      color: white;
+      border-color: #0044cc;
     }
 
     button {
-      background: #33FF33;
-      color: black;
+      background: #222;
+      color: white;
       font-size: 16px;
       padding: 12px;
       border: none;
@@ -91,7 +90,7 @@
     }
 
     button:hover {
-      background: #55FF55;
+      background: #444;
     }
 
     #result {
@@ -104,6 +103,63 @@
       border-radius: 5px;
       display: none;
     }
+
+    /* Toggle Cyberpunk Button */
+    #toggleBtn {
+      background: none;
+      border: none;
+      color: #00FF00; /* Neon green text */
+      font-size: 16px;
+      cursor: pointer;
+      font-weight: bold;
+      margin-bottom: 20px;
+      transition: all 0.3s;
+    }
+
+    #toggleBtn:hover {
+      text-decoration: underline;
+    }
+
+    /* Cyberpunk Theme */
+    .cyberpunk body {
+      background: #000000; /* Black background */
+      color: #33FF33; /* Neon green text */
+    }
+
+    .cyberpunk .container {
+      background: #282828;
+      color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 255, 255, 0.3);
+    }
+
+    .cyberpunk h1 {
+      color: #00FFFF;
+    }
+
+    .cyberpunk .timer {
+      background: #333;
+      color: #FFD700;
+    }
+
+    .cyberpunk .question {
+      background: #333;
+      border: 1px solid #00FFFF;
+    }
+
+    .cyberpunk button {
+      background: #33FF33;
+      color: #000;
+    }
+
+    .cyberpunk button:hover {
+      background: #55FF55;
+    }
+
+    .cyberpunk input[type="radio"]:checked + label {
+      background: #00FFFF;
+      color: black;
+    }
   </style>
 </head>
 <body>
@@ -114,6 +170,7 @@
   <form id="quizForm"></form>
   <button onclick="checkAnswers()">Submit Test</button>
   <div id="result"></div>
+  <button id="toggleBtn" onclick="toggleTheme()">Toggle Cyberpunk Mode</button>
 </div>
 
 <script>
@@ -131,7 +188,7 @@
       div.id = "question" + index;
       let html = `<p>${index + 1}. ${q.question}</p><div class="options">`;
       q.options.forEach((option, i) => {
-        html += ` 
+        html += `
           <input type="radio" id="q${index}${i}" name="q${index}" value="${option}">
           <label for="q${index}${i}">${String.fromCharCode(65 + i)}) ${option}</label>`;
       });
@@ -177,6 +234,10 @@
     let resultDiv = document.getElementById("result");
     resultDiv.innerHTML = `<p>Your score: ${score} out of ${questions.length}</p>`;
     resultDiv.style.display = "block";
+  }
+
+  function toggleTheme() {
+    document.body.classList.toggle("cyberpunk");
   }
 </script>
 
