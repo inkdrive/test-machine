@@ -2,122 +2,129 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Test Paper Generator</title>
+    <title>Test Paper Generator - Terminal Style</title>
     <style>
         /* Terminal-like styling */
         body {
-            background: black;
-            color: #33FF33;
+            background: #000;
+            color: #00FF00;
             font-family: monospace;
             padding: 20px;
+            margin: 0;
         }
         .container {
             max-width: 800px;
             margin: auto;
+            background: #111;
+            padding: 20px;
+            border: 2px solid #00FF00;
+            border-radius: 10px;
+        }
+        h1 {
+            text-align: center;
+            color: #00FF00;
+            margin-bottom: 20px;
+        }
+        p.instructions {
+            font-size: 14px;
+            margin-bottom: 10px;
         }
         textarea {
-            background: black;
-            color: #33FF33;
-            border: 1px solid #33FF33;
             width: 100%;
-            font-family: monospace;
-            margin-bottom: 10px;
-            padding: 5px;
             height: 300px;
+            background: #000;
+            color: #00FF00;
+            border: 1px solid #00FF00;
+            padding: 10px;
+            font-family: monospace;
+            border-radius: 5px;
+            box-sizing: border-box;
         }
         button {
-            background: #33FF33;
-            color: black;
+            background: #00FF00;
+            color: #000;
+            font-family: monospace;
             padding: 10px;
             border: none;
+            border-radius: 5px;
             cursor: pointer;
-            margin-top: 5px;
+            width: 100%;
+            margin-top: 10px;
+            font-size: 16px;
+            transition: background 0.3s;
         }
         button:hover {
-            background: #55ff55;
+            background: #55FF55;
         }
-        .log p {
-            margin: 5px 0;
-        }
-        code {
-            background: #222;
-            padding: 2px 4px;
+        #message {
+            margin-top: 15px;
+            font-size: 14px;
+            text-align: center;
         }
     </style>
 </head>
 <body>
+
 <div class="container">
-    <h1>Test Paper Generator Terminal</h1>
-    <p>Enter your questions (one per line) using this format:</p>
-    <p>
+    <h1>Test Paper Generator</h1>
+    <p class="instructions">
+        Enter your questions below, one per line, using the format:<br>
         <code>QUESTION_TEXT | OPTION_A | OPTION_B | OPTION_C | OPTION_D | CORRECT_OPTION_LETTER</code>
     </p>
-    <p>Example:</p>
-    <p>
-        <code>What is the function of the diaphragm? | Contraction | Relaxation | Gas exchange | None | A</code>
-    </p>
-    <textarea id="questionInput" placeholder="Enter one question per line"></textarea>
-    <br>
-    <button onclick="addQuestions()">Add Questions</button>
+    <textarea id="questionInput" placeholder="Type your questions here..."></textarea>
     <button onclick="saveTest()">Save Test and Open Test Page</button>
-    <div id="log" class="log"></div>
+    <div id="message"></div>
 </div>
 
 <script>
-    let questions = [];
-
-    function addQuestions() {
-        const inputField = document.getElementById("questionInput");
-        // Split the input by newlines so that each line is treated as one question
-        let lines = inputField.value.split("\n");
-        let addedCount = 0;
-        for (let line of lines) {
-            if (line.trim() === "") continue; // Skip empty lines
-            // Expected format: QUESTION | OPTION_A | OPTION_B | OPTION_C | OPTION_D | CORRECT_OPTION
-            let parts = line.split("|").map(s => s.trim());
-            if (parts.length !== 6) {
-                log(`Invalid format for line: ${line}`);
-                continue;
-            }
-            let [qText, optA, optB, optC, optD, correct] = parts;
-            correct = correct.toUpperCase();
-            const validLetters = ["A", "B", "C", "D"];
-            if (!validLetters.includes(correct)) {
-                log(`Correct option must be one of A, B, C, D for line: ${line}`);
-                continue;
-            }
-            let options = [optA, optB, optC, optD];
-            let answer = options[validLetters.indexOf(correct)];
-            questions.push({ question: qText, options: options, answer: answer });
-            addedCount++;
-        }
-        log(`${addedCount} question(s) added successfully.`);
-        // Clear the textarea after adding
-        inputField.value = "";
-    }
-
     function saveTest() {
-        if (questions.length === 0) {
-            log("No questions added. Please add at least one question.");
+        const input = document.getElementById("questionInput").value;
+        if (!input.trim()) {
+            document.getElementById("message").textContent = "Please enter at least one question.";
             return;
         }
-        // Generate a random ID (e.g., 8 characters long)
-        const testId = Math.random().toString(36).substr(2, 8); // Generate 8-character random ID
 
-        // Save questions with the generated test ID in localStorage
-        localStorage.setItem(testId, JSON.stringify(questions));
-        log("Test saved successfully! Opening test page...");
+        // Split input by new lines
+        const lines = input.split("\n").map(line => line.trim()).filter(line => line !== "");
+        let questions = [];
+        let invalidLines = [];
 
-        // Redirect to the test page with the unique test ID in the URL
-        setTimeout(() => { window.location.href = `test.html?id=${testId}`; }, 1000);
-    }
+        lines.forEach((line, idx) => {
+            // Split by " | "
+            const parts = line.split(" | ").map(part => part.trim());
+            if (parts.length !== 6) {
+                invalidLines.push(idx + 1);
+            } else {
+                // Construct a question object
+                const [qText, optA, optB, optC, optD, correct] = parts;
+                // You can optionally validate that correct is one of A, B, C, D (upper or lower case)
+                if (!["A", "B", "C", "D"].includes(correct.toUpperCase())) {
+                    invalidLines.push(idx + 1);
+                } else {
+                    questions.push({
+                        question: qText,
+                        options: [optA, optB, optC, optD],
+                        answer: correct.toUpperCase()  // store uppercase letter
+                    });
+                }
+            }
+        });
 
-    function log(message) {
-        const logDiv = document.getElementById("log");
-        let p = document.createElement("p");
-        p.textContent = message;
-        logDiv.appendChild(p);
+        if (invalidLines.length > 0) {
+            document.getElementById("message").textContent = "Error: The following line(s) have an invalid format: " + invalidLines.join(", ");
+            return;
+        }
+
+        // Save questions to localStorage under the key "questionPaper"
+        localStorage.setItem("questionPaper", JSON.stringify(questions));
+        document.getElementById("message").textContent = "Test saved successfully!";
+
+        // Optionally, after a short delay, redirect to test.html
+        setTimeout(() => {
+            window.location.href = "test.html";
+        }, 1000);
     }
 </script>
+
 </body>
 </html>
