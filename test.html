@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>Dynamic Test</title>
   <style id="themeStyle">
-    /* Normal Theme */
+    /* Default Modern Theme */
     body {
       background: #f5f5f5;
       color: #222;
@@ -122,43 +122,43 @@
 
     /* Cyberpunk Theme */
     .cyberpunk body {
-      background: #000000; /* Black background */
-      color: #33FF33; /* Neon green text */
+      background: #000000 !important; /* Black background */
+      color: #33FF33 !important; /* Neon green text */
     }
 
     .cyberpunk .container {
-      background: #282828;
-      color: #fff;
+      background: #282828 !important;
+      color: #fff !important;
       border-radius: 10px;
       box-shadow: 0 4px 10px rgba(0, 255, 255, 0.3);
     }
 
     .cyberpunk h1 {
-      color: #00FFFF;
+      color: #00FFFF !important;
     }
 
     .cyberpunk .timer {
-      background: #333;
-      color: #FFD700;
+      background: #333 !important;
+      color: #FFD700 !important;
     }
 
     .cyberpunk .question {
-      background: #333;
-      border: 1px solid #00FFFF;
+      background: #333 !important;
+      border: 1px solid #00FFFF !important;
     }
 
     .cyberpunk button {
-      background: #33FF33;
-      color: #000;
+      background: #33FF33 !important;
+      color: #000 !important;
     }
 
     .cyberpunk button:hover {
-      background: #55FF55;
+      background: #55FF55 !important;
     }
 
     .cyberpunk input[type="radio"]:checked + label {
-      background: #00FFFF;
-      color: black;
+      background: #00FFFF !important;
+      color: black !important;
     }
   </style>
 </head>
@@ -188,7 +188,7 @@
       div.id = "question" + index;
       let html = `<p>${index + 1}. ${q.question}</p><div class="options">`;
       q.options.forEach((option, i) => {
-        html += `
+        html += ` 
           <input type="radio" id="q${index}${i}" name="q${index}" value="${option}">
           <label for="q${index}${i}">${String.fromCharCode(65 + i)}) ${option}</label>`;
       });
