@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Page</title>
+    <style>
+        /* Normal theme styling */
+        body {
+            background: #f4f4f4;
+            color: #333;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+        }
+        h1 {
+            text-align: center;
+        }
+        .question {
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        .timer {
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Test</h1>
+    <div class="timer" id="timer">Time left: 30:00</div>
+    <form id="quizForm"></form>
+    <button onclick="checkAnswers()">Submit Test</button>
+    <div id="result"></div>
+</div>
+
+<script>
+    // Get the test ID from the URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const testId = urlParams.get('id');
+
+    // Retrieve the questions from localStorage using the test ID
+    let questions = JSON.parse(localStorage.getItem(testId) || "[]");
+    const quizForm = document.getElementById("quizForm");
+
+    if (questions.length === 0) {
+        quizForm.innerHTML = "<p>No questions found. Please check the test URL.</p>";
+    } else {
+        // Dynamically generate questions with options
+        questions.forEach((q, index) => {
+            let div = document.createElement("div");
+            div.classList.add("question");
+            div.id = "question" + index;
+            let html = `<p>${index + 1}. ${q.question}</p>`;
+            q.options.forEach((option, i) => {
+                html += `<input type="radio" name="q${index}" value="${option}"> ${String.fromCharCode(65 + i)}) ${option}<br>`;
+            });
+            div.innerHTML = html;
+            quizForm.appendChild(div);
+        });
+    }
+
+    // Countdown timer (set to 30 minutes by default)
+    let timeLeft = 30 * 60; // in seconds
+    const timerDisplay = document.getElementById("timer");
+
+    function updateTimer() {
+        let minutes = Math.floor(timeLeft / 60);
+        let seconds = timeLeft % 60;
+        timerDisplay.textContent = `Time left: ${minutes}:${seconds < 10 ? "0" + seconds : seconds}`;
+        if (timeLeft > 0) {
+            timeLeft--;
+            setTimeout(updateTimer, 1000);
+        } else {
+            checkAnswers(); // Auto-submit when time is up
+        }
+    }
+    updateTimer();
+
+    function checkAnswers() {
+        let score = 0;
+        questions.forEach((q, index) => {
+            let selected = document.querySelector(`input[name="q${index}"]:checked`);
+            let questionDiv = document.getElementById("question" + index);
+            if (selected) {
+                if (selected.value === q.answer) {
+                    score++;
+                } else {
+                    questionDiv.classList.add("wrong");
+                    questionDiv.innerHTML += `<p class="correct-answer">Correct answer: ${q.answer}</p>`;
+                }
+            } else {
+                questionDiv.classList.add("wrong");
+                questionDiv.innerHTML += `<p class="correct-answer">Correct answer: ${q.answer}</p>`;
+            }
+        });
+        document.getElementById("result").innerHTML = `<p>Your score: ${score} out of ${questions.length}</p>`;
+    }
+</script>
+</body>
+</html>
